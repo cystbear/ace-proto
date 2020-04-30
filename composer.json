@@ -29,6 +29,7 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "symfony/monolog-bundle": "^3.0",
         "symfony/polyfill-apcu": "^1.0",
+        "symfony/security-acl": "v3.0.4",
         "symfony/swiftmailer-bundle": "^2.3",
         "symfony/symfony": "^3.3",
         "twig/extensions": "^1.5",
