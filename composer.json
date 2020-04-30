@@ -34,7 +34,8 @@
         "symfony/symfony": "^3.3",
         "twig/extensions": "^1.5",
         "twig/twig": "^1.28 || ^2.0",
-        "white-october/pagerfanta-bundle": "^1.0"
+        "white-october/pagerfanta-bundle": "^1.0",
+        "friendsofsymfony/user-bundle": "v2.1.2"
     },
     "require-dev": {
         "dama/doctrine-test-bundle"            : "^3.0",
