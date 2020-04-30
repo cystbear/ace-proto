@@ -12,6 +12,7 @@
 namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\User;
+use AppBundle\Entity\FosUser;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -40,8 +41,8 @@ class UserFixtures extends AbstractFixture implements ContainerAwareInterface
     {
         $passwordEncoder = $this->container->get('security.password_encoder');
 
-        $janeAdmin = new User();
-        $janeAdmin->setFullName('Jane Doe');
+        $janeAdmin = new FosUser();
+        $janeAdmin->setEnabled(true);
         $janeAdmin->setUsername('jane_admin');
         $janeAdmin->setEmail('jane_admin@symfony.com');
         $janeAdmin->setRoles(['ROLE_ADMIN']);
@@ -53,8 +54,8 @@ class UserFixtures extends AbstractFixture implements ContainerAwareInterface
         // See https://symfony.com/doc/current/bundles/DoctrineFixturesBundle/index.html#sharing-objects-between-fixtures
         $this->addReference('jane-admin', $janeAdmin);
 
-        $tomAdmin = new User();
-        $tomAdmin->setFullName('Tom Doe');
+        $tomAdmin = new FosUser();
+        $tomAdmin->setEnabled(true);
         $tomAdmin->setUsername('tom_admin');
         $tomAdmin->setEmail('tom_admin@symfony.com');
         $tomAdmin->setRoles(['ROLE_ADMIN']);
@@ -63,8 +64,8 @@ class UserFixtures extends AbstractFixture implements ContainerAwareInterface
         $manager->persist($tomAdmin);
         $this->addReference('tom-admin', $tomAdmin);
 
-        $johnUser = new User();
-        $johnUser->setFullName('John Doe');
+        $johnUser = new FosUser();
+        $johnUser->setEnabled(true);
         $johnUser->setUsername('john_user');
         $johnUser->setEmail('john_user@symfony.com');
         $encodedPassword = $passwordEncoder->encodePassword($johnUser, 'kitten');

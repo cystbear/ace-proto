@@ -65,14 +65,41 @@ twig:
         - 'form/layout.html.twig'
         - 'form/fields.html.twig'
 
-# Doctrine Configuration (used to access databases and manipulate their information)
 doctrine:
     dbal:
-        # if you don't want to use SQLite, change the URL in parameters.yml or set the DATABASE_URL environment variable
-        url: '%env(DATABASE_URL)%'
+        default_connection: default
+        connections:
+            default:
+                driver: pdo_pgsql
+                host: localhost
+                port: 5432
+                dbname: "ace_proto"
+                user: "postgres"
+                password: "postgres"
+                charset: UTF8
+                server_version: "9"
+                mapping_types:
+                    _text: text
+
     orm:
-        auto_generate_proxy_classes: '%kernel.debug%'
-        auto_mapping: true
+        auto_generate_proxy_classes: "%kernel.debug%"
+        connection: default
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        mappings:
+            App:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/AppBundle/Entity'
+                prefix: 'AppBundle\Entity'
+                alias: AppBundle
+
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: AppBundle\Entity\FosUser
+    from_email:
+        address: "fosub@localhost"
+        sender_name: FOSUB
 
 # Swiftmailer Configuration (used to send emails)
 # instead of configuring the mailer credentials in this file, we pull

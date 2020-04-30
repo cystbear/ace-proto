@@ -69,9 +69,9 @@ class Comment
     private $publishedAt;
 
     /**
-     * @var User
+     * @var FosUser
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\FosUser")
      * @ORM\JoinColumn(nullable=false)
      */
     private $author;
@@ -120,7 +120,7 @@ class Comment
     }
 
     /**
-     * @return User
+     * @return FosUser
      */
     public function getAuthor()
     {
@@ -128,9 +128,9 @@ class Comment
     }
 
     /**
-     * @param User $author
+     * @param FosUser $author
      */
-    public function setAuthor(User $author)
+    public function setAuthor(FosUser $author)
     {
         $this->author = $author;
     }
