@@ -33,6 +33,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(), // used for initial population of non-SQLite databases in production envs
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new FOS\UserBundle\FOSUserBundle(),
+            new Symfony\Bundle\AclBundle\AclBundle(),
         ];
 
         // Some bundles are only used while developing the application or during

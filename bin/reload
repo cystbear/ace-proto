@@ -4,4 +4,5 @@ bin/console cache:clear            --env=dev --no-warmup
 bin/console cache:warmup           --env=dev
 bin/console doctrine:schema:drop   --env=dev --force --full-database
 bin/console doctrine:schema:update --env=dev --force --complete
+bin/console acl:init               --env=dev
 bin/console doctrine:fixtures:load --env=dev --purge-with-truncate --no-interaction
