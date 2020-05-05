@@ -35,10 +35,10 @@
     </div>
 
     <h3>
-        <i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|transchoice(post.comments|length) }}
+        <i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|transchoice(comments|length) }}
     </h3>
 
-    {% for comment in post.comments %}
+    {% for comment in comments %}
         <div class="row post-comment">
             <a name="comment_{{ comment.id }}"></a>
             <h4 class="col-sm-3">

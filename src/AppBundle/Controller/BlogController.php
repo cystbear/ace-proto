@@ -27,6 +27,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
+use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+
 /**
  * Controller used to manage blog contents in the public part of the site.
  *
@@ -70,17 +79,59 @@ class BlogController extends Controller
      */
     public function postShowAction(Post $post)
     {
-        // Symfony provides a function called 'dump()' which is an improved version
-        // of the 'var_dump()' function. It's useful to quickly debug the contents
-        // of any variable, but it's not available in the 'prod' environment to
-        // prevent any leak of sensitive information.
-        // This function can be used both in PHP files and Twig templates. The only
-        // requirement is to have enabled the DebugBundle.
-        if ('dev' === $this->getParameter('kernel.environment')) {
-            dump($post, $this->getUser(), new \DateTime());
+        $allComments = $post->getComments();
+        $aclProvider = $this->get('security.acl.provider');
+
+        $token = $this->get('security.token_storage')->getToken();
+        $sid = UserSecurityIdentity::fromToken($token);
+
+        $mask = (new MaskBuilder())
+            ->add(MaskBuilder::MASK_OWNER)
+            ->get()
+        ;
+
+        $comments = [];
+        foreach ($allComments as $comment) {
+            // $oid = ObjectIdentity::fromDomainObject($comment);
+            $oid = new ObjectIdentity((string)$comment->getId(), Comment::class);
+            try {
+                $acl = $aclProvider->findAcl($oid, [$sid]);
+                if ($acl->isGranted([$mask], [$sid])) {
+                    $comments[] = $comment;
+                }
+            } catch (AclNotFoundException $e) {
+            }
         }
 
-        return $this->render('blog/post_show.html.twig', ['post' => $post]);
+        return $this->render('blog/post_show.html.twig', [
+            'post' => $post,
+            'comments' => $comments,
+        ]);
+
+//        ==========
+//        ==========
+
+//        $allComments = $post->getComments();
+//
+//        $token = $this->get('security.token_storage')->getToken();
+//        $voter = $this->get('app.acl.voter');
+//
+//
+//        $comments = [];
+//        foreach ($allComments as $comment) {
+//            if (VoterInterface::ACCESS_GRANTED === $voter->vote(
+//                $token,
+//                $comment, [
+//                BasicPermissionMap::PERMISSION_OWNER
+//            ])) {
+//                $comments[] = $comment;
+//            }
+//        }
+//
+//        return $this->render('blog/post_show.html.twig', [
+//            'post' => $post,
+//            'comments' => $comments,
+//        ]);
     }
 
     /**
@@ -106,6 +157,20 @@ class BlogController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();
+
+            // creating the ACL
+            $aclProvider = $this->get('security.acl.provider');
+            $objectIdentity = ObjectIdentity::fromDomainObject($comment);
+            $acl = $aclProvider->createAcl($objectIdentity);
+
+            // retrieving the security identity of the currently logged-in user
+            $tokenStorage = $this->get('security.token_storage');
+            $user = $tokenStorage->getToken()->getUser();
+            $securityIdentity = UserSecurityIdentity::fromAccount($user);
+
+            // grant owner access
+            $acl->insertObjectAce($securityIdentity, MaskBuilder::MASK_OWNER);
+            $aclProvider->updateAcl($acl);
 
             // When triggering an event, you can optionally pass some information.
             // For simple applications, use the GenericEvent object provided by Symfony

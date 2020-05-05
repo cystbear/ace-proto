@@ -102,6 +102,7 @@ class Post
      *
      * @ORM\OneToMany(
      *      targetEntity="Comment",
+     *      fetch="EXTRA_LAZY",
      *      mappedBy="post",
      *      orphanRemoval=true
      * )
